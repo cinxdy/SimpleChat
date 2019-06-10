@@ -1,24 +1,29 @@
 import java.net.*;
 import java.io.*;
+import java.util.Scanner;
 
 public class ChatClient {
 
 	public static void main(String[] args) {
-		if(args.length != 2){
-			System.out.println("Usage : java ChatClient <username> <server-ip>");
-			System.exit(1);
-		}
+
+		//#1
+		Scanner input = new Scanner(System.in);
+		System.out.print("your name >> ");
+		String name = input.next();
+		System.out.print("server ip >> ");
+		String ip = input.next();
+
 		Socket sock = null;
 		BufferedReader br = null;
 		PrintWriter pw = null;
 		boolean endflag = false;
 		try{
-			sock = new Socket(args[1], 10001);
+			sock = new Socket(ip, 10001);
 			pw = new PrintWriter(new OutputStreamWriter(sock.getOutputStream()));
 			br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 			// send username.
-			pw.println(args[0]);
+			pw.println(name);
 			pw.flush();
 			InputThread it = new InputThread(sock, br);
 			it.start();
@@ -26,6 +31,8 @@ public class ChatClient {
 			while((line = keyboard.readLine()) != null){
 				pw.println(line);
 				pw.flush();
+				if(line.equals("/userlist"))
+					send_userlist();
 				if(line.equals("/quit")){
 					endflag = true;
 					break;
@@ -50,6 +57,11 @@ public class ChatClient {
 			}catch(Exception ex){}
 		} // finally
 	} // main
+
+	public void send_userlist(){
+
+	}
+
 } // class
 
 class InputThread extends Thread{
